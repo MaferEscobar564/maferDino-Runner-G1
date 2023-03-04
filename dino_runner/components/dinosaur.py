@@ -2,7 +2,7 @@ import pygame
 import dino_runner
 from pygame.sprite import Sprite
 
-from dino_runner.utils.constants import JUMPING, RUNNING
+from dino_runner.utils.constants import JUMPING, RUNNING, DUCKING
 
 DINO_RUNNING = "running"
 DINO_JUMPING = "jumping"
@@ -36,7 +36,14 @@ class Dinosaur(Sprite): #El () en una clase es para indicar que se va a extraer 
 
        if self.step >= 10:
            self,step = 0
-
+    
+    def duck(self):
+        self.image = DUCKING[self.step_index // 5]
+        self.rect = self.image.get_rect()
+        self.rect.x = self.POSITION_X
+        self.rect.y = self.POSITION_Y
+        self.step += 1
+        
     def jump(self):
        
         self.image = JUMPING
