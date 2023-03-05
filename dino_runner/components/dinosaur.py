@@ -1,12 +1,11 @@
-
-
 import pygame
 from pygame.sprite import Sprite
 
-from dino_runner.utils.constants import JUMPING, RUNNING
+from dino_runner.utils.constants import JUMPING, RUNNING, DUCKING
 
 DINO_RUNNING = "running"
 DINO_JUMPING = "jumping"
+DINO_DUCKING = "ducking"
 
 class Dinosaur(Sprite): #El () en una clase es para indicar que se va a extraer algo de otro archivo py. 
     POSITION_X = 80
@@ -28,33 +27,42 @@ class Dinosaur(Sprite): #El () en una clase es para indicar que se va a extraer 
            self.run()
        elif self.action == DINO_JUMPING:
            self.jump()
+       elif self.action == DINO_DUCKING:
+           self.duck()
 
-       if self.action != DINO_JUMPING:
-           if user_input[pygame.K_UP]:
-               self.action = DINO_JUMPING
-           else:
+       if user_input[pygame.K_UP]:
+               self.action = DINO_JUMPING 
+       elif user_input[pygame.K_DOWN]: 
+               self.action = DINO_DUCKING
+       elif self.action != DINO_JUMPING or self.action != DINO_DUCKING:
                self.action = DINO_RUNNING
 
        if self.step >= 10:
            self.step = 0
+    
+    def duck(self):
+        self.image = DUCKING[self.step // 5]
+        self.rect = self.image.get_rect()
+        self.rect.x = self.POSITION_X
+        self.rect.y = self.POSITION_Y + 36
+        self.step += 1
 
     def jump(self):
-       
         self.image = JUMPING
         self.rect.y -= self.jump_velocity *4
         self.jump_velocity -= 0.8
         print("VELOCITY ::", self.jump_velocity)
         print("Y ::", self.rect.y)
-        if self.jump_velocity < -self.JUMP_VELOCITY:
+        if self.jump_velocity < - self.JUMP_VELOCITY:
                self.jump_velocity = self.JUMP_VELOCITY
                self.action = DINO_RUNNING
                self.rect.y = self.POSITION_Y
         
-    def run (self):
+    def run(self):
         self.image = RUNNING[self.step // 5] 
         self.rect = self.image.get_rect()
         self.rect.x = self.POSITION_X
-        self.rect.y = self.POSITION_Y
+        self.rect.y = self.POSITION_Y 
         self.step += 1
 
     def draw(self, screen):
