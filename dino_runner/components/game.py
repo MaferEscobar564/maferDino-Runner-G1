@@ -1,7 +1,7 @@
 import pygame
 import dino_runner
 from dino_runner.components.dinosaur import Dinosaur
-from dino_runner.components.obstacles.cactus import Cactus
+from dino_runner.components.obstacles.cactus import SmallCactus, LargeCactus
 from dino_runner.components.obstacles.obstacle_manager import ObstacleManager
 from dino_runner.utils.constants import BG, ICON, SCREEN_HEIGHT, SCREEN_WIDTH, TITLE, FPS
 
