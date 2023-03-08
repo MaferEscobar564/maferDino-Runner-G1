@@ -1,11 +1,10 @@
 from pdb import Restart
 import pygame
 from dino_runner.components.dinosaur import Dinosaur
-from dino_runner.components.obstacles.dies import Dies
 from dino_runner.components.obstacles.obstacle_manager import ObstacleManager
 from dino_runner.components.score import Score
 
-from dino_runner.utils.constants import BG, DINO_START, FONT_STYLE, ICON, SCREEN_HEIGHT, SCREEN_WIDTH, TITLE, FPS
+from dino_runner.utils.constants import BG, DINO_START, FONT_STYLE, GAME_OVER, ICON, RESET, SCREEN_HEIGHT, SCREEN_WIDTH, TITLE, FPS
 
 class Game:
     def __init__(self):
@@ -24,7 +23,7 @@ class Game:
         self.obstacle_manager = ObstacleManager()
         self.death_count = 0
         self.score = Score()
-        self.dies = Dies()
+
 
     def run(self): 
         self.executing = True 
@@ -36,7 +35,9 @@ class Game:
 
     def start_game(self):
         # Game loop: events - update - draw
+        self.game_speed = 20 
         self.playing = True
+        self.score.reset()
         self.obstacle_manager.reset()
         while self.playing:
             self.events()
@@ -49,11 +50,11 @@ class Game:
                 self.playing = False
 
     def update(self):
-        user_imput = pygame.key.get_pressed()
-        self.player.update(user_imput)
+        user_input = pygame.key.get_pressed()
+        self.player.update(user_input)
         self.obstacle_manager.update(self.game_speed, self.player, self.on_death)
-        self.score.update(self)
-        self.dies.update(self)
+        self.score.update(self, self.playing)
+       
 
     def draw(self):
         self.clock.tick(FPS)
@@ -62,7 +63,6 @@ class Game:
         self.player.draw(self.screen)
         self.obstacle_manager.draw(self.screen)
         self.score.draw(self.screen)
-        self.dies.draw(self.screen)
         pygame.display.update()
         pygame.display.flip()
 
@@ -85,29 +85,49 @@ class Game:
         font = pygame.font.Font(FONT_STYLE, 32)
         half_screen_width = SCREEN_WIDTH // 2
         half_screen_height = SCREEN_HEIGHT // 2
+        x = 360
+        y = 200
+        x_1 = 510
+        y_1 = 250
         #Mensaje de bienvenida centrado
         if not self.death_count:
             text = font.render("Welcome, press any key to start!", True,(0,0,0))
             text_rect = text.get_rect()
             text_rect.center = (half_screen_width, half_screen_height)
             self.screen.blit(text, text_rect)  
-        if self.death_count:
-            text = font.render("Press any key to Restart!", True, (0, 0, 0))
+            self.screen.blit(DINO_START,(half_screen_width - 40, half_screen_height - 140))
+        elif self.death_count:
+            font = pygame.font.Font(FONT_STYLE, 15)
+            text = font.render("Press any key to restart!", True,(0,0,0))
             text_rect = text.get_rect()
-            text_rect.center = (half_screen_width, half_screen_height)
+            text_rect.center = (half_screen_width, half_screen_height + 40)
             self.screen.blit(text, text_rect)  
-            
-            score = font.render("You score: " + str(self.score), True, (0, 0, 0))
-            score_rect = score.get_rect()
-            score_rect.center = (half_screen_width, half_screen_height + 50)
-            self.screen.blit(score, score_rect)  
+            self.screen.blit(GAME_OVER, (x, y))
+            self.screen.blit(RESET, (x_1, y_1))
 
-        self.screen.blit(DINO_START,(half_screen_width -
-                         40, half_screen_height - 140))
+            deaths_draw_text = half_screen_height + 75
+            score_draw_text = half_screen_height + 100
+            deaths = f"Deaths: {self.death_count}" 
+            score = f"Score: {self.score.update(self, self.playing)}"
+            self.draw_text(half_screen_height, deaths_draw_text, deaths, 20)
+            self.draw_text(half_screen_height, score_draw_text, score, 20)
+
+
+            
+
         #Plasmar cambios
         pygame.display.update()
         #Manejar los eventos
         self.handle_menu_events()
+    
+    def draw_text(self, x, y, text, size):
+        font = pygame.font.Font(FONT_STYLE, size)
+        text = font.render(text, True, (0, 0, 0))
+        text_rect = text.get_rect()
+        text_rect.center = (x, y)
+        self.screen.blit(text, text_rect)  
+        
+
 
     def handle_menu_events(self):
         for event in pygame.event.get():
