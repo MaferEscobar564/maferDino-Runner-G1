@@ -2,9 +2,10 @@ from pdb import Restart
 import pygame
 from dino_runner.components.dinosaur import Dinosaur
 from dino_runner.components.obstacles.obstacle_manager import ObstacleManager
+from dino_runner.components.power_ups.power_up_manager import PowerUpManager
 from dino_runner.components.score import Score
 
-from dino_runner.utils.constants import BG, DINO_START, FONT_STYLE, GAME_OVER, ICON, RESET, SCREEN_HEIGHT, SCREEN_WIDTH, TITLE, FPS
+from dino_runner.utils.constants import BG, DEFAULT_TYPE, DINO_START, FONT_STYLE, GAME_OVER, ICON, RESET, SCREEN_HEIGHT, SCREEN_WIDTH, SHIELD_TYPE, TITLE, FPS
 
 class Game:
     def __init__(self):
@@ -23,6 +24,7 @@ class Game:
         self.obstacle_manager = ObstacleManager()
         self.death_count = 0
         self.score = Score()
+        self.power_up_manager = PowerUpManager()
 
 
     def run(self): 
@@ -39,6 +41,7 @@ class Game:
         self.playing = True
         self.score.reset()
         self.obstacle_manager.reset()
+        self.power_up_manager.reset()
         while self.playing:
             self.events()
             self.update()
@@ -54,6 +57,7 @@ class Game:
         self.player.update(user_input)
         self.obstacle_manager.update(self.game_speed, self.player, self.on_death)
         self.score.update(self, self.playing)
+        self.power_up_manager.update(self.game_speed, self.score.score, self.player)
        
 
     def draw(self):
@@ -63,6 +67,8 @@ class Game:
         self.player.draw(self.screen)
         self.obstacle_manager.draw(self.screen)
         self.score.draw(self.screen)
+        self.power_up_manager.draw(self.screen)
+        self.player.check_power_up(self.screen)
         pygame.display.update()
         pygame.display.flip()
 
@@ -112,9 +118,6 @@ class Game:
             self.draw_text(half_screen_height, deaths_draw_text, deaths, 20)
             self.draw_text(half_screen_height, score_draw_text, score, 20)
 
-
-            
-
         #Plasmar cambios
         pygame.display.update()
         #Manejar los eventos
@@ -126,6 +129,17 @@ class Game:
         text_rect = text.get_rect()
         text_rect.center = (x, y)
         self.screen.blit(text, text_rect)  
+    
+    def check_power_up(self, screen):
+        if self.type == SHIELD_TYPE:
+            time_to_show = round(
+                (self.power_up_time_up- pygame.time.get_ticks()) / 1000, 2)
+            if time_to_show >= 0:
+                self.draw_text(f"{self.type.capitalize()} enabled for {time_to_show} seconds.",
+                              screen, font_size=16, pos_y_center=50)
+            else:
+                self.type = DEFAULT_TYPE 
+                self.power_up_time_up = 0
         
 
 
