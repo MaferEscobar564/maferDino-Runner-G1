@@ -1,5 +1,5 @@
 import pygame
-from dino_runner.utils.constants import FONT_STYLE
+from dino_runner.utils.constants import FONT_STYLE, HAMMER_TYPE
 
 class Score():
     def __init__(self):
@@ -8,11 +8,14 @@ class Score():
     def update(self, game, playing):
         if playing == True:
             self.score += 1    
-        elif self.score % 100 == 0: 
-            game.game_speed += 2
         else:
             self.score -= 0
         
+        if self.score == HAMMER_TYPE and self.score % 0 == 0:
+            game.game_speed == 0
+        elif self.score % 100 == 0: 
+            game.game_speed += 2
+            
         return self.score
     
     def reset(self):

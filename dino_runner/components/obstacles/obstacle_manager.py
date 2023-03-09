@@ -1,4 +1,4 @@
-import pygame, random
+import random
 from dino_runner.components.obstacles.cactus import SmallCactus, LargeCactus
 from dino_runner.components.obstacles.bird import Bird 
 
@@ -19,7 +19,6 @@ class ObstacleManager:
         for obstacle in self.obstacles:
             obstacle.update(game_speed, self.obstacles)
             if player.rect.colliderect(obstacle.rect): 
-                pygame.time.delay(500)
                 on_death()
 
     def draw(self, screen):

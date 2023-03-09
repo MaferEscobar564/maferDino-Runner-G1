@@ -1,14 +1,17 @@
 import pygame
 from pygame.sprite import Sprite
-from dino_runner.utils.constants import DEFAULT_TYPE, DUCKING_SHIELD, JUMPING, JUMPING_SHIELD, RUNNING, DUCKING, RUNNING_SHIELD, SHIELD_TYPE
+from dino_runner.components.text import Text
+
+from dino_runner.utils.constants import DEFAULT_TYPE, DUCKING_HAMMER, DUCKING_SHIELD, FONT_STYLE, HAMMER_TYPE, JUMPING, JUMPING_HAMMER, JUMPING_SHIELD, RUNNING, DUCKING, RUNNING_HAMMER, RUNNING_SHIELD, SHIELD_TYPE 
+
 
 DINO_RUNNING = "running"
 DINO_JUMPING = "jumping"
 DINO_DUCKING = "ducking"
 
-DUCK_IMG = {DEFAULT_TYPE: DUCKING, SHIELD_TYPE: DUCKING_SHIELD}
-JUMP_IMG= {DEFAULT_TYPE: JUMPING, SHIELD_TYPE: JUMPING_SHIELD} 
-RUN_IMG= {DEFAULT_TYPE: RUNNING, SHIELD_TYPE: RUNNING_SHIELD}
+DUCK_IMG = {DEFAULT_TYPE: DUCKING, SHIELD_TYPE: DUCKING_SHIELD, HAMMER_TYPE: DUCKING_HAMMER }
+JUMP_IMG = {DEFAULT_TYPE: JUMPING, SHIELD_TYPE: JUMPING_SHIELD, HAMMER_TYPE: JUMPING_HAMMER}
+RUN_IMG = {DEFAULT_TYPE: RUNNING, SHIELD_TYPE: RUNNING_SHIELD, HAMMER_TYPE: RUNNING_HAMMER}
 
 class Dinosaur(Sprite): #El () en una clase es para indicar que se va a extraer algo de otro archivo py. 
     POSITION_X = 80
@@ -26,6 +29,7 @@ class Dinosaur(Sprite): #El () en una clase es para indicar que se va a extraer 
         self.step = 0
         self.action = DINO_RUNNING
         self.jump_velocity = self.JUMP_VELOCITY
+        self.text = Text()
     
     def update(self, user_input):
        if self.action == DINO_RUNNING: 
@@ -79,5 +83,10 @@ class Dinosaur(Sprite): #El () en una clase es para indicar que se va a extraer 
         self.power_up_time_up = power_up.start_time +\
               (power_up.duration * 1000)
         
-    
+    def check_power_up(self, screen):
+        if self.type == SHIELD_TYPE or self.type == HAMMER_TYPE:
+            time_to_show = round((self.power_up_time_up- pygame.time.get_ticks()) / 1000, 2)
+            if time_to_show >= 0:
+                self.text.show(100, 350, f"{self.type.capitalize()} enabled for {time_to_show} seconds.", 18, screen)
 
+    
